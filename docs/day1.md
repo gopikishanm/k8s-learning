@@ -1,7 +1,7 @@
-# Day 1
+## Day 1
 
 
-## Article 1
+### Article 1
 Slow start of kubernetes pods. A volume has to be mounted to pod. The restart was performed by rollout restart of statefulset. The pod was in init state for 30 minutes. The kubelet showed context deadline exceeded which means api server is unresponsive during this time. Below error in logs
 
 ```bash
@@ -26,7 +26,7 @@ spec:
         fsGroupChangePolicy: OnRootMismatch
 ```
 
-## Article 2
+### Article 2
 
 Kubernetes does not have traditional login concept. The login is performed by SA tokens and certificates. 
 
@@ -49,7 +49,7 @@ Openshift has built in oauth-openshift server to manage authentication/authoriza
 
 ![Difference](./images/openshift_k8s.png)
 
-## Reference
+### Reference
 
 - https://blog.cloudflare.com/one-line-kubernetes-fix-saved-600-hours-a-year/
 - https://blog.audit-radar.com/why-kubernetes-has-no-login-and-how-we-solved-it-for-auditradar
