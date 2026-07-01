@@ -2,37 +2,40 @@
 
 ### ipBlock in NetworkPolicy
 
-This can be used to define ingress/egress to specific ipBlocks.
+The `ipBlock` field allows you to define ingress and egress rules for specific IP ranges.
 
-When we define a kubernetes service, we can decide which port of service should be routed to backend port. These ports can be different in the sense, service can define port 8080 and traffic can be routed to backend port 80.
+#### Service Port vs. Backend Port
+When defining a Kubernetes Service, it's important to distinguish between the **Service Port** (the port exposed by the service) and the **TargetPort** (the port on the backend pod). 
 
-When debugging routing issues, key things to consider
+For example:
+- A Service might listen on port `8080`.
+- It can route traffic to a backend application running on port `80`.
 
-- Service ports are not always backend ports
-- Hairpin routing changes policy behaviour. Requests to public endpoints may loop back internally and end up targetting backend pods directly.
-- Validate selectors of pods from live resources
+#### Debugging Routing Issues
+When troubleshooting routing, consider these key points:
+- **Port Mismatch**: Ensure you are targeting the correct backend port.
+- **Hairpin Routing**: Understand how requests to public endpoints might loop back internally and target backend pods directly.
+- **Selector Validation**: Always validate that the pod selectors in your live resources correctly match the intended pods.
 
 ### Image Signing
 
-Cosign is one of the way to sign the image and we can use Kyverno policies to enforce running only signed images.
+**Cosign** is a standard tool for signing container images, and we can use **Kyverno policies** to ensure that only verified images are allowed to run in the cluster.
 
-Steps for signing the image
+#### Workflow for Signing Images
+1. **Install Cosign**: Install the binary on your local machine or CI/CD runner.
+2. **Generate Keys**: Create a public/private key pair for signing.
+3. **Sign Images**: Use the private key to sign specific images.
 
-- Install cosign
-- Generate signing keys
-- Sign the image using cosign generated keys
+#### Why Signing by Digest is Critical
+If you sign an image based on a tag (e.g., `v1`), the signature remains valid even if the underlying image content changes while keeping the same tag. To solve this, Cosign supports signing by **digest** (the unique SHA256 hash of the actual image content).
 
-If we use tags like v1 and sign image based on tags, then signature might look valid even if underlying image has changed. To solved this problem, cosign solves this by signing by digest and not tag. 
+When an image is signed, a record is created containing:
+- The image digest (`sha256` hash)
+- The signing certificate
+- A cryptographic proof that the entry exists
 
-When we publish the image, a record is created containing
-
-- image digest (sha256 hash)
-- signing certificate
-- cryptographic proof that entry exists
-
-We can define `ImageValidationPolicy` in kyverno and use cogisn attestor keys to verify image signature.
-
-There is another option `Sigstore Policy Controller` which is preferred way to validate images.
+#### Policy Enforcement
+You can define an `ImageValidationPolicy` in Kyverno to verify signatures using Cosign attestor keys. Alternatively, you can use the **Sigstore Policy Controller**, which is a highly recommended way to validate images.
 
 ### Questions
 
